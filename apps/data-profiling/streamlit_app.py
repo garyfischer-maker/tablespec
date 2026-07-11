@@ -71,10 +71,10 @@ st.set_page_config(
 st.markdown(
     """
 <style>
-/* ── Trim the default top whitespace so the header sits near the top ── */
+/* ── Trim default top whitespace, but keep a cushion above the header bar ── */
 .block-container,
 div[data-testid="stMainBlockContainer"] {
-    padding-top: 1.2rem !important;
+    padding-top: 2.5rem !important;
 }
 
 /* ── Brand header bar ─────────────────────────────────────────── */
@@ -102,24 +102,29 @@ div[data-testid="stMainBlockContainer"] {
     text-transform: uppercase;
     margin-top: 2px;
 }
-.synaptiq-product {
-    margin-left: auto;
-    text-align: right;
-}
+/* Three-section header: wordmark left, product name centered, logo right. */
+.hdr-left   { flex: 1; text-align: left; }
+.hdr-center { flex: 1; text-align: center; }
+.hdr-right  { flex: 1; display: flex; justify-content: flex-end; align-items: center; }
 .synaptiq-product-name {
     color: #FFFFFF;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 0.06em;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
 }
 
 /* ── Tab styling ──────────────────────────────────────────────── */
 div[data-testid="stTabs"] button[role="tab"] {
-    font-weight: 600;
-    font-size: 0.92rem;
+    font-weight: 700;
+    font-size: 1.18rem;
     letter-spacing: 0.03em;
     color: #6B8EAD;
+    padding: 0.4rem 0.2rem;
+}
+div[data-testid="stTabs"] button[role="tab"] p {
+    font-size: 1.18rem;
+    font-weight: 700;
 }
 div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
     color: #C8956A !important;
@@ -1021,6 +1026,7 @@ def _sidebar():
     st.sidebar.divider()
 
     _render_sidebar_compute()
+    _render_sidebar_dashboard()
     st.sidebar.divider()
 
     with st.sidebar.expander("Run history", expanded=False):
@@ -1093,9 +1099,6 @@ def _sidebar():
                         unsafe_allow_html=True,
                     )
 
-    st.sidebar.divider()
-    _render_sidebar_dashboard()
-
 
 _sidebar()
 
@@ -1105,35 +1108,37 @@ _sidebar()
 import os as _os
 
 _logo_path = _os.path.join(_os.path.dirname(__file__), "assets", "Synaptiq_001.png")
-if _os.path.exists(_logo_path):
-    st.image(_logo_path, width=150)
-else:
-    # Fallback styled wordmark until logo file is added to assets/
-    st.markdown(
-        "<div style='font-size:1.3rem;font-weight:800;letter-spacing:0.05em;"
-        "color:#2D3748;padding-top:6px;'>Synaptiq.</div>",
-        unsafe_allow_html=True,
-    )
 
-# Blue brand header bar (logo mark removed — replaced by image above)
+# Blue brand header bar: wordmark (left) · product name (center). Empty right
+# section keeps the centered title balanced.
 st.markdown(
     """
-<div class="synaptiq-header" style="margin-top:6px;">
-  <div>
+<div class="synaptiq-header">
+  <div class="hdr-left">
     <div class="synaptiq-wordmark">Synaptiq</div>
     <div class="synaptiq-tagline">The Humankind of AI</div>
   </div>
-  <div class="synaptiq-product">
+  <div class="hdr-center">
     <div class="synaptiq-product-name">Tablespec Guidebook and Profiling</div>
   </div>
+  <div class="hdr-right"></div>
 </div>
 """,
     unsafe_allow_html=True,
 )
 
-st.caption(
-    "Your spec driven ingestion framework: Guidebook and Profiling tools"
-)
+# Subtitle (left) + logo (far right), on the row directly under the bar.
+_sub_col, _sub_logo_col = st.columns([5, 1], vertical_alignment="center")
+with _sub_col:
+    st.markdown(
+        "<div style='font-size:1.18rem;color:#4A5568;font-weight:500;"
+        "padding-top:4px;'>Your spec driven ingestion framework: "
+        "Guidebook and Profiling tools</div>",
+        unsafe_allow_html=True,
+    )
+with _sub_logo_col:
+    if _os.path.exists(_logo_path):
+        st.image(_logo_path, width=150)
 
 st.divider()
 _GENIE_SPACE_ID = os.environ.get("GENIE_SPACE_ID", "")
